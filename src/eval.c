@@ -204,10 +204,10 @@ int negaMax(BOARD_STATE *board, int depth) {
 
 static void printMoveText(MOVE move) {
 
-    char startFile = SQ120F(move.startSquare) + 'a';
-    char startRank = SQ120R(move.startSquare) + '1';
-    char endFile = SQ120F(move.endSquare) + 'a';
-    char endRank = SQ120R(move.endSquare) + '1';
+    char startFile = SQ120F(SQ64SQ120(START(move.compress))) + 'a';
+    char startRank = SQ120R(SQ64SQ120(START(move.compress))) + '1';
+    char endFile = SQ120F(SQ64SQ120(END(move.compress))) + 'a';
+    char endRank = SQ120R(SQ64SQ120(END(move.compress))) + '1';
 
     char promote = '\0';
     if (move.type == MOVE_QUEENPROMOTE ||

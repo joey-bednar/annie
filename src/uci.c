@@ -40,7 +40,8 @@ static void playUCIMove(BOARD_STATE *board, int start, int end, char promo) {
     int n_moves = generateMoves(board, moves);
 
     for (int i = 0; i < n_moves; i++) {
-        if (moves[i].startSquare == start && moves[i].endSquare == end &&
+        if (SQ64SQ120(START(moves[i].compress)) == start &&
+            SQ64SQ120(END(moves[i].compress)) == end &&
             isLegalMove(board, moves[i])) {
             if (promo == ' ' || promo == '\n') {
                 makeMove(board, moves[i]);

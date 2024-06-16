@@ -43,10 +43,6 @@ static void testScan() {
     BOARD_STATE board;
     // init legal moves array
     MOVE moves[MAX_LEGAL_MOVES];
-    for (int i = 0; i < MAX_LEGAL_MOVES; i++) {
-        moves[i].startSquare = OFFBOARD;
-        moves[i].endSquare = OFFBOARD;
-    }
 
     for (int rank = RANK_8; rank >= RANK_1; rank--) {
         for (int file = FILE_A; file <= FILE_H; file++) {
@@ -68,10 +64,6 @@ static void testScanAll() {
     BOARD_STATE board;
     // init legal moves array
     MOVE moves[MAX_LEGAL_MOVES];
-    for (int i = 0; i < MAX_LEGAL_MOVES; i++) {
-        moves[i].startSquare = OFFBOARD;
-        moves[i].endSquare = OFFBOARD;
-    }
 
     initBoard(&board);
 

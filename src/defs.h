@@ -32,6 +32,9 @@
 #define CHAR2RANK(c) ((int)((c) - '1'))
 #define CHAR2SQ120(f, r) (FR2SQ120((CHAR2FILE((f))), (CHAR2RANK((r)))))
 
+#define START(move) (int)((move) & 0x7F)
+#define END(move) (int)(((move) & 0x1F80) >> 7)
+
 // clang-format off
 enum { EMPTY, wP, wN, wB, wR, wQ, wK, bP, bN, bB, bR, bQ, bK, OFFBOARD };
 enum { bbWhite, bbBlack, bbPawn, bbKnight, bbBishop, bbRook, bbQueen, bbKing, bbAny, bbLength };
@@ -84,6 +87,7 @@ typedef struct {
 } BOARD_STATE;
 
 typedef struct {
+    unsigned long compress;
     int type;
     int piece;
     int startSquare;
