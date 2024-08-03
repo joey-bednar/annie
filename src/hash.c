@@ -12,13 +12,24 @@ static ULL get64rand() {
 
 // init random zobrist values
 void initZobrist() {
-    srand(1);
+
+    srand(2);
+
     for (int piece = wP; piece <= bK; ++piece) {
         for (int sq = 0; sq < 64; ++sq) {
             zobrist_vals[piece - 1][sq] = get64rand();
         }
     }
+
     zobristB2M = get64rand();
+
+    for (int i = 0; i < 32; i++) {
+        zobristCastle[i] = get64rand();
+    }
+
+    for (int i = 0; i < 64; i++) {
+        zobristEnpassant[i] = get64rand();
+    }
 }
 
 // constructs hash of position
@@ -47,4 +58,18 @@ void updateZobrist(int sq64, int piece, BOARD_STATE *board) {
 // updates zobrist hash with new turn
 void turnZobrist(BOARD_STATE *board) {
     board->hash ^= zobristB2M;
+}
+
+// updates zobrist hash with castle permissions
+void castleZobrist(BOARD_STATE *board) {
+    board->hash ^= zobristCastle[board->castle];
+}
+
+// updates zobrist hash with en passant square
+void epZobrist(BOARD_STATE *board) {
+    if (ONBOARD(board->enpassant)) {
+        board->hash ^= zobristEnpassant[board->enpassant];
+    } else {
+        board->hash ^= zobristEnpassant[0];
+    }
 }

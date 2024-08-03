@@ -75,9 +75,10 @@
 // hash table
 #define TT_SIZE 0x400000
 #define TT_EMPTY 1234
-#define TT_EXACT_FLAG 0
-#define TT_ALPHA_FLAG 1
-#define TT_BETA_FLAG 2
+#define TT_EMPTY_FLAG 0
+#define TT_EXACT_FLAG 1
+#define TT_ALPHA_FLAG 2
+#define TT_BETA_FLAG 3
 
 #define BITLOOP(bb) for (; (bb); (bb) &= ((bb) - 1))
 
@@ -107,9 +108,10 @@ typedef unsigned long MOVE;
 
 typedef struct tt {
     ULL hash;
+    MOVE best;
     int depth;
     int flag;
-    int score;
+    int val;
 } TT;
 
 typedef struct {
@@ -139,8 +141,6 @@ typedef struct {
 
     int ply;
 
-    PVENTRY pvtable[PVSIZE];
-
     MOVE pvarray[MAX_DEPTH][MAX_DEPTH];
     int pvlength[MAX_DEPTH];
 
@@ -152,10 +152,12 @@ typedef struct {
     int cutoffTime;
     float start;
 
+    MOVE best;
+
 } BOARD_STATE;
 
-extern PVENTRY hashtable[PVSIZE];
 extern TT tt[TT_SIZE];
+extern TT pvTable[TT_SIZE];
 
 extern int inputDepth;
 extern int inputTime[2];
@@ -184,6 +186,8 @@ extern int kingSqTable[2][64];
 
 extern ULL zobrist_vals[12][64];
 extern ULL zobristB2M;
+extern ULL zobristCastle[32];
+extern ULL zobristEnpassant[64];
 
 extern int pawnOffset[2][4];
 extern const int rookOffset[4];
@@ -195,6 +199,8 @@ extern void initZobrist();
 extern void loadZobrist(BOARD_STATE *board);
 extern void updateZobrist(int sq64, int piece, BOARD_STATE *board);
 extern void turnZobrist(BOARD_STATE *board);
+extern void castleZobrist(BOARD_STATE *board);
+extern void epZobrist(BOARD_STATE *board);
 
 // init.c
 extern void initBoard(BOARD_STATE *board);
@@ -258,5 +264,13 @@ extern void search(BOARD_STATE *board);
 // uci.c
 extern int loadFEN(char *fen, BOARD_STATE *board, int startIndex);
 extern void startUCI();
+
+// tt.c
+extern void initTT();
+extern int probeTT(ULL hash, MOVE *best, int alpha, int beta, int depth);
+extern MOVE pvTT(ULL hash);
+extern void storeTT(ULL hash, MOVE best, int val, int flag, int depth);
+extern MOVE moveTT(ULL hash);
+extern void storePVTT(ULL hash, MOVE best, int val, int flag, int depth);
 
 #endif

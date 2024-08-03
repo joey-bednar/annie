@@ -91,6 +91,9 @@ void unmakeNullMove(BOARD_STATE *board) {
 // play a move on the board
 void makeMove(BOARD_STATE *board, MOVE move) {
 
+    // castleZobrist(board);
+    // epZobrist(board);
+
     // add info to played moves
     int index = board->pmindex;
     board->playedmoves[index].halfmove = board->halfmove;
@@ -157,6 +160,8 @@ void makeMove(BOARD_STATE *board, MOVE move) {
         ++board->fullmove;
     }
 
+    // epZobrist(board);
+    // castleZobrist(board);
     turnZobrist(board);
     board->turn = !(board->turn);
 
@@ -165,6 +170,9 @@ void makeMove(BOARD_STATE *board, MOVE move) {
 
 // undo a move on the board
 void unmakeMove(BOARD_STATE *board, MOVE move) {
+
+    // castleZobrist(board);
+    // epZobrist(board);
 
     // clear hash
     int index = --board->pmindex;
@@ -200,6 +208,8 @@ void unmakeMove(BOARD_STATE *board, MOVE move) {
             --board->fullmove;
         }
 
+        // epZobrist(board);
+        // castleZobrist(board);
         turnZobrist(board);
         board->turn = !(board->turn);
         return;
@@ -225,6 +235,8 @@ void unmakeMove(BOARD_STATE *board, MOVE move) {
         --board->fullmove;
     }
 
+    // epZobrist(board);
+    // castleZobrist(board);
     turnZobrist(board);
     board->turn = !(board->turn);
 }

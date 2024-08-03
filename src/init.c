@@ -14,6 +14,8 @@ ULL kingJumps[64];
 
 ULL zobrist_vals[12][64];
 ULL zobristB2M;
+ULL zobristCastle[32];
+ULL zobristEnpassant[64];
 
 int pawnOffset[2][4] = {{N, 2 * N, NW, NE}, {S, 2 * S, SW, SE}};
 
@@ -314,6 +316,7 @@ void init(BOARD_STATE *board) {
     initPieceSqMaps();
     initZobrist();
     initSlidingRays();
+    initTT();
 
     clearBoard(board);
     initBoard(board);

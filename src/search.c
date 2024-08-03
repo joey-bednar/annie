@@ -3,7 +3,23 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
+
+static int confirmLegalMove(BOARD_STATE *board, MOVE move) {
+
+    MOVE moves[MAX_LEGAL_MOVES];
+    int n_moves = generateMoves(board, moves);
+
+    for (int i = 0; i < n_moves; ++i) {
+        if (move == moves[i]) {
+            makeMove(board, move);
+            return !isAttacked(board, SQ64SQ120(getKingSq(board, !board->turn)),
+                               board->turn);
+        }
+    }
+    return FALSE;
+}
 
 int compareMoves(const void *moveA, const void *moveB) {
     return (CAPTURED(*(MOVE *)moveB) - CAPTURED(*(MOVE *)moveA));
@@ -15,14 +31,10 @@ static void sortMoves(BOARD_STATE *board, MOVE *moves, int n_moves) {
         return;
     }
 
-    if (hashtable[board->hash % PVSIZE].pos == board->hash) {
+    MOVE m = pvTT(board->hash);
+    if (m != 0ull) {
         for (int i = 0; i < n_moves; i++) {
-            if (START120(moves[i]) ==
-                    START120(hashtable[board->hash % PVSIZE].move) &&
-                END120(moves[i]) ==
-                    END120(hashtable[board->hash % PVSIZE].move) &&
-                PROMOTED(moves[i]) ==
-                    PROMOTED(hashtable[board->hash % PVSIZE].move)) {
+            if (moves[i] == m) {
                 MOVE temp = moves[i];
                 moves[i] = moves[0];
                 moves[0] = temp;
@@ -31,6 +43,7 @@ static void sortMoves(BOARD_STATE *board, MOVE *moves, int n_moves) {
         qsort(moves + 1, n_moves - 1, sizeof(MOVE), compareMoves);
         return;
     }
+
     qsort(moves, n_moves, sizeof(MOVE), compareMoves);
 }
 
@@ -43,11 +56,11 @@ static int isMateEval(int score) {
 static void printEval(int score, int depth) {
 
     if (score + MATETHRESHOLD >= MATE && score - MATETHRESHOLD <= MATE) {
-        int mate = (depth + 1) / 2;
+        int mate = MATE - score;
         printf("score mate %d ", mate);
     } else if (score + MATETHRESHOLD >= -MATE &&
                score - MATETHRESHOLD <= -MATE) {
-        int mate = (depth) / 2;
+        int mate = MATE + score;
         printf("score mate -%d ", mate);
     } else {
         printf("score cp %d ", score);
@@ -62,23 +75,35 @@ static void printInfo(BOARD_STATE *board, float time, int score, int depth) {
 
     printf("info ");
     printf("depth %d ", depth);
-    printEval(score, board->pvlength[0]);
+    printEval(score, 0);
     printf("nodes %ld ", (long)board->nodes);
     printf("nps %ld ", nps);
     printf("time %ld ", (long)time);
 
-    // skip pv output for search depth 0
-    if (board->pvlength[0] == 0) {
-        printf("\n");
-        return;
-    }
+    // // skip pv output for search depth 0
+    // if (board->pvlength[0] == 0) {
+    //     printf("\n");
+    //     return;
+    // }
 
     printf("pv ");
 
-    for (int i = 0; i < board->pvlength[0]; ++i) {
-        printMoveText(board->pvarray[0][i]);
+    int index = 0;
+    MOVE move[MAX_DEPTH];
+
+    BOARD_STATE b;
+    memcpy(&b, board, sizeof(BOARD_STATE));
+
+    for (int i = 0; i < depth; i++) {
+        move[index] = pvTT(b.hash);
+        if (!confirmLegalMove(&b, move[index])) {
+            break;
+        }
+        printMoveText(move[index]);
         printf(" ");
+        index++;
     }
+
     printf("\n");
 }
 
@@ -245,6 +270,8 @@ static int nullmovesearch(BOARD_STATE *board, int depth, int alpha, int beta) {
 static int alphabeta(BOARD_STATE *board, int depth, int alpha, int beta,
                      int doNull) {
 
+    int hashf = TT_ALPHA_FLAG;
+
     checkTime(board);
     if (board->stopped) {
         return 0;
@@ -269,8 +296,16 @@ static int alphabeta(BOARD_STATE *board, int depth, int alpha, int beta,
         ++depth;
     }
 
+    // MOVE bestmove;
+    // int probe = probeTT(board->hash, &bestmove, alpha, beta, depth);
+    // if (probe != TT_EMPTY && board->ply > 0) {
+    //     return probe;
+    // }
+
     if (depth == 0) {
-        return quiesce(board, QMAXDEPTH, alpha, beta);
+        int score = quiesce(board, QMAXDEPTH, alpha, beta);
+        // storeTT(board->hash, 0ull, score, TT_EXACT_FLAG, depth);
+        return score;
     }
 
     if (depth >= 4 && !incheck) {
@@ -305,19 +340,24 @@ static int alphabeta(BOARD_STATE *board, int depth, int alpha, int beta,
         --board->ply;
 
         if (score >= beta) {
+            storeTT(board->hash, moves[i], beta, TT_BETA_FLAG, depth);
             return beta;
         }
         if (score > alpha) {
             alpha = score;
 
-            // add moves to pvarray
-            board->pvarray[board->ply][board->ply] = moves[i];
-            for (int j = board->ply + 1; j < board->pvlength[board->ply + 1];
-                 ++j) {
-                board->pvarray[board->ply][j] =
-                    board->pvarray[board->ply + 1][j];
-            }
-            board->pvlength[board->ply] = board->pvlength[board->ply + 1];
+            hashf = TT_EXACT_FLAG;
+            // storeTT(board->hash, moves[i], score, hashf, depth);
+            storePVTT(board->hash, moves[i], score, hashf, depth);
+
+            // // add moves to pvarray
+            // board->pvarray[board->ply][board->ply] = moves[i];
+            // for (int j = board->ply + 1; j < board->pvlength[board->ply + 1];
+            //      ++j) {
+            //     board->pvarray[board->ply][j] =
+            //         board->pvarray[board->ply + 1][j];
+            // }
+            // board->pvlength[board->ply] = board->pvlength[board->ply + 1];
         }
     }
 
@@ -331,6 +371,7 @@ static int alphabeta(BOARD_STATE *board, int depth, int alpha, int beta,
         }
     }
 
+    // storeTT(board->hash, 0ull, score, hashf, depth);
     return alpha;
 }
 
@@ -356,20 +397,6 @@ void printMoveText(MOVE move) {
         printf("%c%c%c%c%c", startFile, startRank, endFile, endRank, promote);
     } else {
         printf("%c%c%c%c", startFile, startRank, endFile, endRank);
-    }
-}
-
-static void copyPVtoTable(BOARD_STATE *board, int depth) {
-    for (int i = 0; i < depth; i++) {
-        ULL hash = board->hash;
-        hashtable[hash % PVSIZE].pos = hash;
-        hashtable[hash % PVSIZE].move = board->pvarray[0][i];
-        makeMove(board, hashtable[hash % PVSIZE].move);
-    }
-
-    for (int i = depth - 1; i >= 0; i--) {
-        MOVE move = board->pvarray[0][i];
-        unmakeMove(board, move);
     }
 }
 
@@ -468,17 +495,17 @@ void search(BOARD_STATE *board) {
             break;
         }
 
-        // redo search with INF window if score is outside aspiration window
-        if (score <= alpha || score >= beta) {
-            alpha = -INF;
-            beta = INF;
-            searchDepth--;
-            continue;
-        }
-
-        // set aspiration window
-        alpha = score - ASPIRATION_WINDOW;
-        beta = score + ASPIRATION_WINDOW;
+        // // redo search with INF window if score is outside aspiration window
+        // if (score <= alpha || score >= beta) {
+        //     alpha = -INF;
+        //     beta = INF;
+        //     searchDepth--;
+        //     continue;
+        // }
+        //
+        // // set aspiration window
+        // alpha = score - ASPIRATION_WINDOW;
+        // beta = score + ASPIRATION_WINDOW;
 
         // measure time spent
         float new_t = clock() - board->start;
@@ -488,10 +515,7 @@ void search(BOARD_STATE *board) {
         printInfo(board, time_taken_ms, score, searchDepth);
 
         // get bestmove/ponder from pv
-        bestmove = board->pvarray[0][0];
-
-        // load PV into TT
-        copyPVtoTable(board, board->pvlength[0]);
+        bestmove = pvTT(board->hash);
 
         // end searches in timed games if mate is found
         if (isMateEval(score) && inputTime[board->turn] != DEFAULT_TIME) {
@@ -502,6 +526,8 @@ void search(BOARD_STATE *board) {
         if (searchCutoff(board, time_taken_ms)) {
             break;
         }
+
+        // printBoard(board);
     }
 
     // print best move
