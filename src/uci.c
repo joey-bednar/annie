@@ -251,11 +251,11 @@ void startUCI() {
         }
         fgets(input, INPUTLEN, stdin);
 
-        if (strcmp("ucinewgame", input) == 0) {
+        if (strncmp("ucinewgame", input, 10) == 0) {
             initBoard(&board);
             printf("readyok\n");
         } else if (strncmp("uci", input, 3) == 0) {
-            printf("id name %s %s\n", NAME, VERSION);
+            printf("id name %s v%s\n", NAME, VERSION);
             printf("id author %s\n", AUTHOR);
             printf("uciok\n");
         } else if (strcmp("isready\n", input) == 0) {

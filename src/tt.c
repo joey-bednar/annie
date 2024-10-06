@@ -1,10 +1,17 @@
 #include "defs.h"
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 
 // clear table
 void initTT() {
-    for (int i = 0; i < TT_SIZE; ++i) {
+    free(tt);
+    ttNumIndices = (inputHash * 1024 * 1024) / sizeof(TT);
+    tt = (TT *)calloc(ttNumIndices, sizeof(TT));
+}
+
+void clearTT() {
+    for (int i = 0; i < ttNumIndices; ++i) {
         tt[i].hash = 0ull;
         tt[i].depth = 0;
         tt[i].flag = TT_EMPTY_FLAG;
@@ -14,7 +21,7 @@ void initTT() {
 }
 
 int probeTT(ULL hash, MOVE *best, int alpha, int beta, int depth) {
-    TT *entry = &tt[hash % TT_SIZE];
+    TT *entry = &tt[hash % ttNumIndices];
 
     if (entry->hash != hash) {
         return TT_EMPTY;
@@ -44,7 +51,7 @@ int probeTT(ULL hash, MOVE *best, int alpha, int beta, int depth) {
 
 void storeTT(BOARD_STATE *board, MOVE best, int val, int flag, int depth) {
 
-    int index = board->hash % TT_SIZE;
+    int index = board->hash % ttNumIndices;
 
     tt[index].hash = board->hash;
     tt[index].depth = depth;
@@ -54,6 +61,6 @@ void storeTT(BOARD_STATE *board, MOVE best, int val, int flag, int depth) {
 }
 
 MOVE getMoveTT(BOARD_STATE *board) {
-    int index = board->hash % TT_SIZE;
+    int index = board->hash % ttNumIndices;
     return tt[index].best;
 }

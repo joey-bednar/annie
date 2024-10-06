@@ -2,7 +2,7 @@
 
 // name
 #define NAME "Amelia"
-#define VERSION "v0.14"
+#define VERSION "0.15"
 #define AUTHOR "Joey Bednar"
 
 // settings
@@ -154,12 +154,14 @@ typedef struct {
 
 } BOARD_STATE;
 
-extern TT tt[TT_SIZE];
+extern TT *tt;
+extern int ttNumIndices;
 
 extern int inputDepth;
 extern int inputMovetime;
 extern int inputTime[2];
 extern int inputInc[2];
+extern int inputHash;
 
 extern int epMap[120];
 extern int sq120sq64Map[120];
@@ -277,5 +279,6 @@ extern void initTT();
 extern int probeTT(ULL hash, MOVE *best, int alpha, int beta, int depth);
 extern void storeTT(BOARD_STATE *board, MOVE best, int val, int flag,
                     int depth);
+extern void clearTT();
 
 #endif

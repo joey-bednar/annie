@@ -25,6 +25,7 @@ int inputDepth;
 int inputMovetime;
 int inputTime[2];
 int inputInc[2];
+int inputHash;
 
 const int rookOffset[4] = {-10, -1, 10, 1};
 const int bishopOffset[4] = {-11, -9, 9, 11};
@@ -45,6 +46,9 @@ ULL isolatedPawns[8];
 int MVVLVA[8][8];
 
 ULL passedPawnTable[64][2];
+
+TT *tt;
+int ttNumIndices;
 
 static ULL generatePassedPawnBB(int sq64, int color) {
 
@@ -369,6 +373,16 @@ static void initIsolatedPawns() {
     }
 }
 
+static void initInputs() {
+    inputInc[WHITE] = 0;
+    inputInc[BLACK] = 0;
+    inputTime[WHITE] = 0;
+    inputTime[BLACK] = 0;
+    inputDepth = 0;
+    inputMovetime = 0;
+    inputHash = 256;
+}
+
 void init(BOARD_STATE *board) {
     initEnpassantMap();
     initColorMap();
@@ -380,6 +394,7 @@ void init(BOARD_STATE *board) {
     initSlidingRays();
     initMVVLVA();
     initPassedPawns();
+    initInputs();
     initTT();
     initHistoryHeuristic(board);
     initFiles();

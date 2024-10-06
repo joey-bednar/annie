@@ -499,6 +499,6 @@ void search(BOARD_STATE *board) {
     printMoveText(bestmove);
     printf("\n");
 
-    initTT();
+    clearTT();
     initHistoryHeuristic(board);
 }
