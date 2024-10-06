@@ -2,7 +2,7 @@
 
 // name
 #define NAME "Amelia"
-#define VERSION "0.15"
+#define VERSION "0.14"
 #define AUTHOR "Joey Bednar"
 
 // settings
