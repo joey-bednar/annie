@@ -109,6 +109,7 @@ static void printInfo(BOARD_STATE *board, float time, int score, int depth) {
     printf("pv ");
     printPV(board, depth);
     printf("\n");
+    fflush(stdout);
 }
 
 static void checkTime(BOARD_STATE *board) {
@@ -389,14 +390,14 @@ void printMoveText(MOVE move) {
 
 // returns true when next iteration of search should be
 // prevented due to time restrictions
-static int searchCutoff(BOARD_STATE *board, float time_ms) {
+int searchCutoff(BOARD_STATE *board, float time_ms) {
 
     // if used more than half of allocated time,
     // don't start a new search
     return (time_ms * 2 >= board->cutoffTime);
 }
 
-static int setCutoff(BOARD_STATE *board) {
+int setCutoff(BOARD_STATE *board) {
     int time = inputTime[board->turn];
     int inc = inputInc[board->turn];
 
@@ -451,13 +452,17 @@ void search(BOARD_STATE *board) {
 
     // reset search time parameters
     board->stopped = FALSE;
-    board->cutoffTime = setCutoff(board);
+    if (!board->ponder) {
+        board->cutoffTime = setCutoff(board);
+    } else {
+        board->cutoffTime = 999999999;
+    }
 
     // begin timer
     board->start = clock();
 
     // if only one legal move, play instantly
-    if (onlyMove(board, &bestmove)) {
+    if (!board->ponder && onlyMove(board, &bestmove)) {
         // print best move
         printf("bestmove ");
         printMoveText(bestmove);
@@ -489,7 +494,7 @@ void search(BOARD_STATE *board) {
         probeTT(board->hash, &bestmove, INF, -INF, 0);
 
         // prevent new searches if not enough time
-        if (searchCutoff(board, time_taken_ms)) {
+        if (!board->ponder && searchCutoff(board, time_taken_ms)) {
             break;
         }
     }
@@ -497,8 +502,19 @@ void search(BOARD_STATE *board) {
     // print best move
     printf("bestmove ");
     printMoveText(bestmove);
+
+    makeMove(board, bestmove);
+
+    printf(" ponder ");
+    MOVE pmove;
+    probeTT(board->hash, &pmove, INF, -INF, 0);
+    printMoveText(pmove);
     printf("\n");
 
-    initTT();
-    initHistoryHeuristic(board);
+    unmakeMove(board, bestmove);
+
+    if (!board->ponder) {
+        initTT();
+        initHistoryHeuristic(board);
+    }
 }

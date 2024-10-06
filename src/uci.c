@@ -231,6 +231,16 @@ int loadFEN(char *fen, BOARD_STATE *board, int startIndex) {
     return i;
 }
 
+static void parseSearchParameters(char *input) {
+    // parse inputs
+    inputDepth = parseUCINumber(input, " depth ", MAX_DEPTH);
+    inputTime[WHITE] = parseUCINumber(input, " wtime ", DEFAULT_TIME);
+    inputTime[BLACK] = parseUCINumber(input, " btime ", DEFAULT_TIME);
+    inputInc[WHITE] = parseUCINumber(input, " winc ", DEFAULT_INC);
+    inputInc[BLACK] = parseUCINumber(input, " binc ", DEFAULT_INC);
+    inputMovetime = parseUCINumber(input, " movetime ", 0);
+}
+
 void *searchThread(void *args) {
 
     BOARD_STATE *board = (BOARD_STATE *)args;
@@ -257,6 +267,7 @@ void startUCI() {
         } else if (strncmp("uci", input, 3) == 0) {
             printf("id name %s v%s\n", NAME, VERSION);
             printf("id author %s\n", AUTHOR);
+            printf("option name Ponder type check default false\n");
             printf("uciok\n");
         } else if (strcmp("isready\n", input) == 0) {
             printf("readyok\n");
@@ -276,23 +287,59 @@ void startUCI() {
 
             int depth = parseUCINumber(input, " perft ", 0);
             perft(depth, &board);
-        } else if (strncmp("go\n", input, 2) == 0) {
-            inputDepth = parseUCINumber(input, " depth ", MAX_DEPTH);
-            inputTime[WHITE] = parseUCINumber(input, " wtime ", DEFAULT_TIME);
-            inputTime[BLACK] = parseUCINumber(input, " btime ", DEFAULT_TIME);
-            inputInc[WHITE] = parseUCINumber(input, " winc ", DEFAULT_INC);
-            inputInc[BLACK] = parseUCINumber(input, " binc ", DEFAULT_INC);
-            inputMovetime = parseUCINumber(input, " movetime ", 0);
 
-            board.stopped = FALSE;
+        } else if (strncmp("go ponder\n", input, 9) == 0) {
 
+            // stop searches, wait for thread to join
+            board.stopped = TRUE;
+            pthread_join(thread_id, NULL);
+            // pthread_exit(&thread_id);
+
+            // parse inputs
+            parseSearchParameters(input);
+
+            // create ponder thread
+            board.ponder = TRUE;
             pthread_create(&thread_id, NULL, searchThread, (void *)&board);
 
+        } else if (strncmp("go\n", input, 2) == 0) {
+
+            // stop searches, wait for thread to join
+            board.stopped = TRUE;
+            pthread_join(thread_id, NULL);
+            // pthread_exit(&thread_id);
+
+            // parse inputs
+            parseSearchParameters(input);
+
+            // create search thread
+            // board.stopped = FALSE;
+            board.ponder = FALSE;
+            pthread_create(&thread_id, NULL, searchThread, (void *)&board);
+
+        } else if (strcmp("ponderhit\n", input) == 0) {
+            // stop searches, wait for thread to join
+            // board.stopped = TRUE;
+            // pthread_join(thread_id, NULL);
+            // pthread_exit(&thread_id);
+
+            // create search thread
+            // board.stopped = FALSE;
+            board.ponder = FALSE;
+            board.cutoffTime = setCutoff(&board);
+            board.start = clock();
+            // pthread_create(&thread_id, NULL, searchThread, (void *)&board);
         } else if (strcmp("stop\n", input) == 0) {
             board.stopped = TRUE;
+            pthread_join(thread_id, NULL);
+            // pthread_exit(&thread_id);
         } else if (strcmp("quit\n", input) == 0) {
             board.stopped = TRUE;
+            pthread_join(thread_id, NULL);
+            // pthread_exit(&thread_id);
             break;
+        } else if (strcmp("setoption\n", input) == 0) {
+            // incomplete
         }
         fflush(stdout);
     }
