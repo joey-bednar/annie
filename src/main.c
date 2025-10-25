@@ -1,7 +1,7 @@
-#include "misc.h"
 #include "init.h"
-#include "uci.h"
+#include "misc.h"
 #include "tt.h"
+#include "uci.h"
 #include <stdlib.h>
 
 TT *tt;

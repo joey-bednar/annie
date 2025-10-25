@@ -3,8 +3,8 @@
 
 #include "board.h"
 #include "hash.h"
-#include "utils.h"
 #include "misc.h"
+#include "utils.h"
 
 // generates random ULL
 static ULL get64rand() {

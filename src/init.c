@@ -2,9 +2,9 @@
 #include <assert.h>
 #include <string.h>
 
+#include "board.h"
 #include "hash.h"
 #include "init.h"
-#include "board.h"
 #include "tt.h"
 
 int epMap[120];

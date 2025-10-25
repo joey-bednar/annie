@@ -303,7 +303,7 @@ void startUCI() {
         } else if (strncmp("go ponder\n", input, 9) == 0) {
 
             // stop searches, wait for thread to join
-            if(!board.stopped) {
+            if (!board.stopped) {
                 board.stopped = TRUE;
                 pthread_join(thread_id, NULL);
             }
@@ -318,7 +318,7 @@ void startUCI() {
         } else if (strncmp("go perft ", input, 8) == 0) {
 
             // stop searches, wait for thread to join
-            if(!board.stopped) {
+            if (!board.stopped) {
                 board.stopped = TRUE;
                 pthread_join(thread_id, NULL);
             }
@@ -333,7 +333,7 @@ void startUCI() {
         } else if (strncmp("go\n", input, 2) == 0) {
 
             // stop searches, wait for thread to join
-            if(!board.stopped) {
+            if (!board.stopped) {
                 board.stopped = TRUE;
                 pthread_join(thread_id, NULL);
             }

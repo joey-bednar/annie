@@ -1,8 +1,8 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
-#include "misc.h"
 #include "board.h"
+#include "misc.h"
 
 #define QMAXDEPTH 100
 #define DEFAULT_TIME 3600000

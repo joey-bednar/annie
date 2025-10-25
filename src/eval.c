@@ -1,8 +1,8 @@
-#include "misc.h"
-#include "board.h"
 #include "eval.h"
-#include "utils.h"
+#include "board.h"
 #include "hash.h"
+#include "misc.h"
+#include "utils.h"
 
 #define PASSED_PAWN_BONUS 30
 #define BISHOP_PAIR_BONUS 30

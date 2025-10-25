@@ -1,8 +1,8 @@
 #ifndef TT_H
 #define TT_H
 
-#include "misc.h"
 #include "board.h"
+#include "misc.h"
 
 #define TT_SIZE 10000000
 #define TT_EMPTY 1234
@@ -23,7 +23,6 @@ extern TT *tt;
 
 void initTT();
 int probeTT(ULL hash, MOVE *best, int alpha, int beta, int depth);
-void storeTT(BOARD_STATE *board, MOVE best, int val, int flag,
-                    int depth);
+void storeTT(BOARD_STATE *board, MOVE best, int val, int flag, int depth);
 
 #endif

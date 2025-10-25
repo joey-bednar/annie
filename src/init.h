@@ -1,8 +1,8 @@
 #ifndef INIT_H
 #define INIT_H
 
-#include "misc.h"
 #include "board.h"
+#include "misc.h"
 
 extern int epMap[120];
 

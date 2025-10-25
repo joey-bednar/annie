@@ -1,8 +1,8 @@
 #ifndef MOVES_H
 #define MOVES_H
 
-#include "misc.h"
 #include "board.h"
+#include "misc.h"
 
 // attack bitboards
 #define KNIGHTBB(sq64) (knightJumps[(sq64)])
@@ -16,7 +16,6 @@
 #define BISHOPOFFSETS bishopOffset
 #define PROMOTES promoteTo
 
-
 // move bitmasks
 #define START(move) (int)((move) & 0x3Ful)
 #define START120(move) SQ64SQ120(START(move))
@@ -28,7 +27,6 @@
 #define TWOPAWNFLAG(move) (int)(((move) & 0x80000ul) >> 19)
 #define CASTLEFLAG(move) (int)(((move) & 0x100000ul) >> 20)
 #define PIECE(move) (int)(((move) & 0x00E00000ul) >> 21)
-
 
 extern int pawnOffset[2][4];
 extern const int rookOffset[4];

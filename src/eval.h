@@ -1,8 +1,8 @@
 #ifndef EVAL_H
 #define EVAL_H
 
-#include "misc.h"
 #include "board.h"
+#include "misc.h"
 
 #define MVVLVA(p, c) (MVVLVA[(p)][(c)])
 #define PASSEDPAWN(sq64, c) (passedPawnTable[(sq64)][(c)])

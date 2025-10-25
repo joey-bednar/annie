@@ -1,8 +1,8 @@
 #ifndef ATTACK_H
 #define ATTACK_H
 
-#include "misc.h"
 #include "board.h"
+#include "misc.h"
 
 extern ULL knightJumps[64];
 extern ULL kingJumps[64];

@@ -1,8 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "misc.h"
 #include "board.h"
+#include "misc.h"
 
 void printBits(unsigned long long num);
 void printBitboard(unsigned long long num);

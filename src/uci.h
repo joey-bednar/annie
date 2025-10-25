@@ -1,8 +1,8 @@
 #ifndef UCI_H
 #define UCI_H
 
-#include "misc.h"
 #include "board.h"
+#include "misc.h"
 
 // name
 #define NAME "Amelia"

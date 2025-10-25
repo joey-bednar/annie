@@ -1,14 +1,13 @@
 #ifndef HASH_H
 #define HASH_H
 
-#include "misc.h"
 #include "board.h"
+#include "misc.h"
 
 extern ULL zobrist_vals[12][64];
 extern ULL zobristB2M;
 extern ULL zobristEP[120];
 extern ULL zobristC[64];
-
 
 void initZobrist();
 void loadZobrist(BOARD_STATE *board);

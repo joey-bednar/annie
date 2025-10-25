@@ -1,9 +1,9 @@
-#include <assert.h>
 #include "board.h"
 #include "hash.h"
-#include "utils.h"
-#include "moves.h"
 #include "misc.h"
+#include "moves.h"
+#include "utils.h"
+#include <assert.h>
 
 // clears the chess board of any pieces
 void clearBoard(BOARD_STATE *board) {
