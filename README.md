@@ -3,10 +3,11 @@
 # Amelia
 #### Chess engine accepting challenges on [Lichess.org](https://lichess.org/@/AmeliaLatest).
 
+[![status](https://lichess-badges.vercel.app/api/status/AmeliaLatest)](https://lichess.org/@/AmeliaLatest/)
 
-[![lichess-bullet](https://lichess-shield.vercel.app/api?username=AmeliaLatest&format=bullet)](https://lichess.org/@/AmeliaLatest/perf/bullet)
-[![lichess-blitz](https://lichess-shield.vercel.app/api?username=AmeliaLatest&format=blitz)](https://lichess.org/@/AmeliaLatest/perf/blitz)
-[![lichess-rapid](https://lichess-shield.vercel.app/api?username=AmeliaLatest&format=rapid)](https://lichess.org/@/AmeliaLatest/perf/rapid)
+[![bullet](https://lichess-badges.vercel.app/api/rating/AmeliaLatest/bullet)](https://lichess.org/@/AmeliaLatest/perf/bullet)
+[![blitz](https://lichess-badges.vercel.app/api/rating/AmeliaLatest/blitz)](https://lichess.org/@/AmeliaLatest/perf/blitz)
+[![rapid](https://lichess-badges.vercel.app/api/rating/AmeliaLatest/rapid)](https://lichess.org/@/AmeliaLatest/perf/rapid)
 
 <img src="logo.png" alt="logo" width="200px" height="200px"/>
 
